@@ -1,0 +1,32 @@
+根據以上架構
+基本要求
+1.每幀8秒生成2幀
+2.觀眾視角
+3.完成複用前幀描述,僅修改變化部份
+4.禁用"相同","依然" 等指代詞
+
+
+欄位	說明與範例
+description	用一句話交代「這是什麼場景、正在發生什麼事」。
+例："description": "夜晚台北信義區街頭，一台白色 Model X 安靜滑過，霓虹燈倒映在濕漉漉的柏油路"
+style	畫面風格關鍵字，可複選。
+例："style": ["cinematic", "cyberpunk", "photorealistic"]
+camera	鏡頭語言：wide-angle、first-person、orbit、symmetrical、dolly-in 等。
+例："camera": "low-angle tracking shot"
+lighting	光線與氛圍：neon rim light、soft daylight、golden hour、volumetric fog。
+例："lighting": "strong backlit with neon rim light"
+room / location	場景空間簡述，幫助 AI 建立世界觀。
+例："location": "futuristic Taipei alley with holographic billboards"
+elements	具體物件與角色，最好包含材質與顏色。
+例："elements": ["white Tesla Model X", "reflective wet asphalt", "purple neon signs"]
+motion	動態描述：particles floating、slow-motion splash、camera tilt-up。
+例："motion": "subtle camera drift forward, raindrops dripping"
+audio	背景音樂、環境音、對白。
+例："audio": "distant city hum, soft synthwave music, subtle tire splash"
+framing	構圖比例與鏡頭設定。
+例："framing": {"aspectRatio": "16:9", "cameraLock": false}
+ending	最後定格畫面，方便收尾。
+例："ending": "Tesla tail lights fade into the neon haze"
+text	是否出現字幕或標語，沒有就填 "none"。
+keywords	3–5 個主題關鍵字，協助 AI 快速鎖定主軸。
+例："keywords": ["cyberpunk", "Taipei night", "electric car"]
