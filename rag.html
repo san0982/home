@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG 檢索策略比較：精準度 vs 複雜度</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #F4F6F8;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+
+        <header class="text-center mb-10 md:mb-16">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#004AAD]">RAG 檢索策略演進</h1>
+            <p class="text-lg md:text-xl text-gray-600 mt-3">精準度 vs. 實現複雜度 綜合分析</p>
+        </header>
+
+
+        <div class="bg-white rounded-lg shadow-xl p-6 md:p-10 mb-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#004AAD] mb-4 text-center">核心權衡：投資與回報</h2>
+            <p class="text-base md:text-lg text-gray-700 max-w-4xl mx-auto leading-relaxed mb-8 text-center">
+                「樸素 RAG」(Naive RAG) 依賴基礎的向量相似度檢索，雖然實現簡單，但在面對複雜查詢時精準度有限。為了突破此瓶頸，業界發展出多種優化路徑。此圖表分析了不同檢索策略在「檢索精準度」與「實現複雜度」兩個關鍵維度上的權衡關係。複雜度不僅代表技術門檻，也隱含著更高的開發、維護與營運成本 (OpEx) 或資本支出 (CapEx)。
+            </p>
+           
+            <div class="relative w-full max-w-4xl mx-auto h-96 md:h-[550px]">
+                <canvas id="complexityVsPrecisionChart"></canvas>
+            </div>
+        </div>
+
+
+        <div class="mb-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#004AAD] mb-6 text-center">檢索方法深度解析</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+
+
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transform transition-transform duration-300 hover:scale-105">
+                    <span class="text-5xl mb-4">🚀</span>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">樸素 RAG (Naive RAG)</h3>
+                    <p class="text-gray-600">
+                        基礎的密集檢索（Dense Retrieval），僅使用向量相似度。
+                    </p>
+                    <div class="mt-4 text-left w-full">
+                        <p class="font-medium text-green-600">優點：實現簡單、快速、成本最低。</p>
+                        <p class="font-medium text-red-600">缺點：資訊損失、面對複雜查詢時精準度低。</p>
+                    </div>
+                </div>
+               
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transform transition-transform duration-300 hover:scale-105">
+                    <span class="text-5xl mb-4">⚖️</span>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">混合式檢索 (Hybrid)</h3>
+                    <p class="text-gray-600">
+                        結合稀疏檢索（如 BM25）與密集檢索（向量）的優點。
+                    </p>
+                    <div class="mt-4 text-left w-full">
+                        <p class="font-medium text-green-600">優點：平衡關鍵字與語義理解，精準度顯著提升。</p>
+                        <p class="font-medium text-red-600">缺點：需要管理兩種索引，架構稍顯複雜。</p>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transform transition-transform duration-300 hover:scale-105">
+                    <span class="text-5xl mb-4">📊</span>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Reranking (重排)</h3>
+                    <p class="text-gray-600">
+                        在檢索後，使用更強大的模型對 Top-K 結果進行重新排序。
+                    </p>
+                    <div class="mt-4 text-left w-full">
+                        <p class="font-medium text-green-600">優點：目前提高精準度的 SOTA 標準實踐。</p>
+                        <p class="font-medium text-red-600">缺點：增加額外延遲；面臨 API (OpEx) 或自架 (CapEx) 的成本選擇。</p>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transform transition-transform duration-300 hover:scale-105">
+                    <span class="text-5xl mb-4">🤖</span>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Agentic RAG</h3>
+                    <p class="text-gray-600">
+                        透過自主代理（Agents）進行規劃、反思與多步檢索。
+                    </p>
+                    <div class="mt-4 text-left w-full">
+                        <p class="font-medium text-green-600">優點：適應非結構化、動態且需多跳躍推理的任務。</p>
+                        <p class="font-medium text-red-600">缺點：高延遲、高 Token 消耗，邏輯複雜。</p>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transform transition-transform duration-300 hover:scale-105">
+                    <span class="text-5xl mb-4">🕸️</span>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">KRAG (知識圖譜 RAG)</h3>
+                    <p class="text-gray-600">
+                        從結構化的知識圖譜中檢索，提供確定性知識。
+                    </p>
+                    <div class="mt-4 text-left w-full">
+                        <p class="font-medium text-green-600">優點：邏輯嚴謹性高，利於全域理解與複雜推理。</p>
+                        <p class="font-medium text-red-600">缺點：知識圖譜的建構與維護成本極高。</p>
+                    </div>
+                </div>
+
+
+                <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transform transition-transform duration-300 hover:scale-105">
+                    <span class="text-5xl mb-4">🧠</span>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">微調 / 新架構 (Finetuning)</h3>
+                    <p class="text-gray-600">
+                        微調 Embedding 模型或採用 MemoRAG 等新架構。
+                    </p>
+                    <div class="mt-4 text-left w-full">
+                        <p class="font-medium text-green-600">優點：可達到最高的性能上限，上下文感知能力強。</p>
+                        <p class="font-medium text-red-600">缺點：最高的成本和複雜性，需要大量標註數據。</p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="bg-white rounded-lg shadow-xl p-6 md:p-10 mb-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#004AAD] mb-4 text-center">RAG 優化成本金字塔</h2>
+            <p class="text-base md:text-lg text-gray-700 max-w-4xl mx-auto leading-relaxed mb-8 text-center">
+                RAG 的優化決策可視為一個成本金字塔。應從基礎層開始實施，並根據業務需求和預算，策略性地選擇是否向頂層投資，以換取更高的精準度。
+            </p>
+           
+            <div class="flex flex-col items-center space-y-1 max-w-lg mx-auto text-center">
+                <div class="bg-[#E91E63] text-white p-4 rounded-t-md shadow-lg w-full" style="max-width: 60%;">
+                    <h4 class="font-bold text-lg">頂層 (按需選擇)</h4>
+                    <p class="text-sm">微調 / 新架構 (MemoRAG)</p>
+                    <p class="text-xs font-light">(極高成本，最高性能)</p>
+                </div>
+                <div class="bg-[#FF9800] text-white p-4 shadow-md w-full" style="max-width: 80%;">
+                    <h4 class="font-bold text-lg">中間層 (策略選擇)</h4>
+                    <p class="text-sm">Reranking / Agentic RAG / KRAG</p>
+                    <p class="text-xs font-light">(高成本，高精準度)</p>
+                </div>
+                <div class="bg-[#004AAD] text-white p-4 rounded-b-md shadow-lg w-full" style="max-width: 100%;">
+                    <h4 class="font-bold text-lg">基礎層 (高效實施)</h4>
+                    <p class="text-sm">提示工程 / 混合式檢索</p>
+                    <p class="text-xs font-light">(低成本，顯著改善)</p>
+                </div>
+            </div>
+        </div>
+
+
+        <footer class="text-center text-gray-500 text-sm mt-12">
+            <p>&copy; 2025 RAG 策略分析報告. 僅供內部參考。</p>
+        </footer>
+
+
+    </div>
+
+
+    <script>
+        (function() {
+            const ctx = document.getElementById('complexityVsPrecisionChart').getContext('2d');
+
+
+            const labels = [
+                '樸素 RAG (Naive RAG)',
+                '混合式檢索 (Hybrid Search)',
+                'Reranking (重排)',
+                'Agentic RAG',
+                ['KRAG (Knowledge', 'Graph RAG)'],
+                '微調 / MemoRAG'
+            ];
+
+
+            const dataPoints = [
+                { x: 1, y: 2 },
+                { x: 3, y: 4 },
+                { x: 4, y: 6 },
+                { x: 8, y: 7 },
+                { x: 9, y: 8 },
+                { x: 10, y: 10 }
+            ];
+
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: '檢索策略',
+                    data: dataPoints,
+                    backgroundColor: [
+                        '#004AAD',
+                        '#5085CA',
+                        '#FFC107',
+                        '#FF9800',
+                        '#E91E63',
+                        '#d32f2f'
+                    ],
+                    borderColor: 'rgba(0, 0, 0, 0.2)',
+                    borderWidth: 1,
+                    pointRadius: 10,
+                    pointHoverRadius: 15,
+                }]
+            };
+
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: '實現複雜度與成本 (低 -> 高)',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: { top: 20 }
+                        },
+                        min: 0,
+                        max: 11,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                if (value === 0) return '低';
+                                if (value === 11) return '高';
+                                return '';
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '檢索精準度 (低 -> 高)',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: { bottom: 20 }
+                        },
+                        min: 0,
+                        max: 11,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                if (value === 0) return '低';
+                                if (value === 11) return '高';
+                                return '';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#333',
+                        titleFont: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 14
+                        },
+                        padding: 12,
+                        cornerRadius: 6,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                    return label.join(' ');
+                                } else {
+                                    return label;
+                                }
+                            },
+                            label: function(context) {
+                                const point = context.raw;
+                                return `複雜度: ${point.x} | 精準度: ${point.y}`;
+                            }
+                        }
+                    }
+                }
+            };
+
+
+            new Chart(ctx, {
+                type: 'scatter',
+                data: data,
+                options: options
+            });
+        })();
+    </script>
+
+
+</body>
+</html>
+
+
+
