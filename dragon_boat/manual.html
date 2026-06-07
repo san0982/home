@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>龍舟排位系統｜使用說明書</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+:root{
+  --ink:#1a1509;
+  --ink2:#4a3f28;
+  --ink3:#8a7a5a;
+  --paper:#faf7f0;
+  --paper2:#f3ede0;
+  --paper3:#e8dfc8;
+  --gold:#c8a84b;
+  --gold2:#e8c86a;
+  --red:#8b2020;
+  --blue:#1a3a6a;
+  --green:#1a5a2a;
+  --border:#d4c89a;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Noto Sans TC',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.8;
+}
+
+/* 背景紋理 */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(200,168,75,.06) 28px,rgba(200,168,75,.06) 29px),
+    repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(200,168,75,.04) 28px,rgba(200,168,75,.04) 29px);
+  pointer-events:none;z-index:0;
+}
+
+/* === HEADER === */
+.cover{
+  position:relative;
+  background:var(--ink);
+  color:#fff;
+  padding:60px 40px 48px;
+  overflow:hidden;
+}
+.cover::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(200,168,75,.07) 20px,rgba(200,168,75,.07) 21px);
+}
+.cover::after{
+  content:'🐉';
+  position:absolute;right:40px;top:50%;transform:translateY(-50%);
+  font-size:120px;opacity:.08;line-height:1;
+}
+.cover-inner{position:relative;z-index:1;max-width:760px;margin:0 auto;}
+.cover-tag{
+  display:inline-block;
+  font-size:11px;letter-spacing:.2em;color:var(--gold2);
+  border:1px solid var(--gold);padding:3px 10px;border-radius:2px;
+  margin-bottom:20px;font-family:'Noto Sans TC',sans-serif;
+}
+.cover h1{
+  font-family:'Noto Serif TC',serif;
+  font-size:36px;font-weight:700;line-height:1.3;
+  margin-bottom:10px;
+}
+.cover h1 span{color:var(--gold2);}
+.cover-sub{font-size:14px;color:rgba(255,255,255,.5);letter-spacing:.05em;}
+
+/* === 目錄 === */
+.toc-wrap{
+  background:var(--paper2);
+  border-bottom:2px solid var(--border);
+  padding:28px 40px;
+  position:sticky;top:0;z-index:50;
+}
+.toc{max-width:760px;margin:0 auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.toc-label{font-size:11px;color:var(--ink3);letter-spacing:.1em;margin-right:6px;}
+.toc a{
+  font-size:12px;padding:4px 12px;border-radius:20px;
+  border:1px solid var(--border);color:var(--ink2);text-decoration:none;
+  transition:all .2s;white-space:nowrap;
+}
+.toc a:hover{background:var(--gold);border-color:var(--gold);color:#fff;}
+
+/* === 內容 === */
+.content{max-width:760px;margin:0 auto;padding:48px 40px 80px;position:relative;z-index:1;}
+
+/* section */
+.section{margin-bottom:52px;}
+.section-header{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:22px;padding-bottom:12px;
+  border-bottom:1.5px solid var(--border);
+}
+.sec-num{
+  font-family:'Noto Serif TC',serif;
+  font-size:28px;font-weight:700;color:var(--gold);
+  line-height:1;min-width:32px;
+}
+.sec-title{
+  font-family:'Noto Serif TC',serif;
+  font-size:20px;font-weight:700;color:var(--ink);
+}
+.sec-desc{font-size:13px;color:var(--ink3);margin-left:auto;white-space:nowrap;}
+
+/* 子標題 */
+h3{
+  font-family:'Noto Serif TC',serif;
+  font-size:16px;font-weight:600;color:var(--ink);
+  margin:24px 0 10px;
+  display:flex;align-items:center;gap:8px;
+}
+h3::before{content:'';display:block;width:4px;height:16px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+
+p{margin-bottom:10px;color:var(--ink2);}
+
+/* 步驟卡 */
+.steps{display:flex;flex-direction:column;gap:10px;}
+.step{
+  display:grid;grid-template-columns:36px 1fr;gap:12px;
+  background:#fff;border:1px solid var(--border);border-radius:8px;
+  padding:14px 16px;align-items:start;
+}
+.step-num{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--ink);color:var(--gold2);
+  font-family:'Noto Serif TC',serif;font-size:15px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-body strong{display:block;font-size:14px;font-weight:700;margin-bottom:3px;color:var(--ink);}
+.step-body span{font-size:13px;color:var(--ink3);}
+
+/* 色票說明 */
+.chips-demo{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.chip-demo{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:7px;font-size:13px;font-weight:500;border:1px solid;
+}
+.chip-L{background:#dceeff;color:#0a4a8a;border-color:#a8cff5;}
+.chip-R{background:#ffe0e8;color:#8a1a3a;border-color:#f5a8c0;}
+.chip-B{background:#e8deff;color:#3a1a8a;border-color:#c0a8f5;}
+.chip-D{background:#fff8e0;color:#7a5800;border-color:#e8c84a;border-style:dashed;}
+.badge{font-size:10px;padding:1px 5px;border-radius:3px;font-weight:700;}
+.chip-L .badge{background:#0a4a8a;color:#fff;}
+.chip-R .badge{background:#8a1a3a;color:#fff;}
+.chip-B .badge{background:#3a1a8a;color:#fff;}
+.chip-D .badge{background:#7a5800;color:#fff;}
+
+/* 警示標籤 */
+.warn-demo{color:#c0392b;font-weight:700;font-size:12px;}
+
+/* 表格 */
+.table-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--ink);color:var(--gold2);padding:9px 12px;text-align:left;font-weight:600;font-size:12px;letter-spacing:.05em;}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--ink2);}
+tr:nth-child(even) td{background:var(--paper2);}
+
+/* xlsx 格式示意 */
+.xlsx-preview{
+  background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:12px 0;
+}
+.xlsx-header{background:var(--ink);color:var(--gold2);padding:7px 14px;font-size:11px;letter-spacing:.08em;}
+.xlsx-body{padding:0;}
+.xrow{display:grid;font-size:12px;}
+.xrow.head{background:var(--paper3);font-weight:700;color:var(--ink);}
+.xrow div{padding:6px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.xrow div:last-child{border-right:none;}
+.xrow.center div{text-align:center;}
+.xcols-roster{grid-template-columns:60px 1fr 80px 80px;}
+.xcols-layout{grid-template-columns:80px 80px 1fr 50px 1fr 80px 80px;}
+
+/* 注意框 */
+.note{
+  background:var(--paper2);border-left:4px solid var(--gold);
+  border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;
+  font-size:13px;color:var(--ink2);
+}
+.note strong{color:var(--ink);display:block;margin-bottom:3px;}
+
+/* 統計卡示意 */
+.stat-demo{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:7px;padding:8px 10px;}
+.stat-card .sl{font-size:10px;color:var(--ink3);margin-bottom:2px;}
+.stat-card .sv{font-size:18px;font-weight:700;color:var(--ink);}
+.stat-card .svt{font-size:12px;font-weight:700;margin-top:3px;}
+.stat-ok .svt{color:var(--green);}
+.stat-ng .svt{color:var(--red);}
+.stat-warn .svt{color:#d4830a;}
+
+/* 區塊示意 */
+.zone-demo{border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px;}
+.zone-flex{background:#fffbe6;border:1px dashed #e8c84a;color:#7a6000;}
+.zone-pool{background:#fff;border:1px solid var(--border);color:var(--ink2);}
+
+/* footer */
+footer{
+  text-align:center;padding:32px;
+  font-size:12px;color:var(--ink3);
+  border-top:1px solid var(--border);
+  background:var(--paper2);
+  position:relative;z-index:1;
+}
+</style>
+</head>
+<body>
+
+<!-- 封面 -->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-tag">USER MANUAL · 使用說明書</div>
+    <h1>🐉 龍舟排位系統<br><span>操作指南</span></h1>
+    <div class="cover-sub">大龍舟 18 槳版本｜支援拖拉排位 · xlsx 匯出匯入 · 體重配重計算</div>
+  </div>
+</div>
+
+<!-- 目錄 -->
+<div class="toc-wrap">
+  <div class="toc">
+    <span class="toc-label">目錄</span>
+    <a href="#s1">系統介紹</a>
+    <a href="#s2">介面說明</a>
+    <a href="#s3">隊員管理</a>
+    <a href="#s4">排位操作</a>
+    <a href="#s5">統計與提示</a>
+    <a href="#s6">匯出匯入</a>
+    <a href="#s7">注意事項</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- 1. 系統介紹 -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="sec-num">01</div>
+      <div class="sec-title">系統介紹</div>
+    </div>
+    <p>本系統是一套專為龍舟隊設計的排位規劃工具，以單一 HTML 檔案形式運作，<strong>不需要安裝任何軟體</strong>，用瀏覽器開啟即可使用，且完全離線運作。</p>
+
+    <h3>適用規格</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>項目</th><th>規格</th></tr>
+        <tr><td>船型</td><td>大龍舟</td></tr>
+        <tr><td>槳手位置</td><td>左右各 9 排，共 18 個槳位</td></tr>
+        <tr><td>最少上場槳手</td><td>16 人（需為偶數，左右各半）</td></tr>
+        <tr><td>最多上場槳手</td><td>18 人</td></tr>
+        <tr><td>鼓手</td><td>1 人（不計入槳手人數）</td></tr>
+        <tr><td>舵手</td><td>1 人（大會公派或自選，不計入槳手人數）</td></tr>
+      </table>
+    </div>
+
+    <h3>主要功能</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">✦</div><div class="step-body"><strong>拖拉排位</strong><span>將隊員方塊從待命池拖到任意槳位、鼓手位、舵手位或靈活運用區</span></div></div>
+      <div class="step"><div class="step-num">✦</div><div class="step-body"><strong>隊員管理</strong><span>隨時新增、刪除隊員，設定姓名、慣用邊（左／右／雙）及體重</span></div></div>
+      <div class="step"><div class="step-num">✦</div><div class="step-body"><strong>即時狀態檢查</strong><span>自動檢核左右人數是否平衡、是否符合出賽人數規定、左右體重差是否在 5 kg 內</span></div></div>
+      <div class="step"><div class="step-num">✦</div><div class="step-body"><strong>xlsx 匯出匯入</strong><span>將隊員名單存成 Excel 檔案，日後可直接載入繼續使用，不必重新輸入</span></div></div>
+    </div>
+  </div>
+
+  <!-- 2. 介面說明 -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="sec-num">02</div>
+      <div class="sec-title">介面說明</div>
+    </div>
+    <p>介面分為左右兩區，各自獨立捲動，互不干擾。</p>
+
+    <h3>左側：隊員名單區</h3>
+    <p>顯示所有已登記的隊員清單，並提供新增隊員的輸入欄位。此區為<strong>管理用途</strong>，不可直接從此拖拉排位，請到右側待命池操作。</p>
+    <div class="note"><strong>操作說明</strong>左側清單只做隊員查閱與新增刪除用。若要排位，請先在右側待命池找到該隊員方塊再拖拉。</div>
+
+    <h3>右側：排位操作區</h3>
+    <p>由上到下依序為：統計列、操作按鈕、鼓手槳位、9 排槳位、靈活運用區、待命池、舵手區塊。</p>
+  </div>
+
+  <!-- 3. 隊員管理 -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="sec-num">03</div>
+      <div class="sec-title">隊員管理</div>
+    </div>
+
+    <h3>新增隊員</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>填入姓名</strong><span>在左側底部的姓名欄位輸入隊員姓名，按 Enter 或點「＋ 新增隊員」</span></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>選擇慣用邊</strong><span>左（慣用左槳）、右（慣用右槳）、雙（左右皆可）</span></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>輸入體重（選填）</strong><span>單位為公斤，可留空，不影響其他功能，體重資料補齊後才會顯示配重差值</span></div></div>
+    </div>
+
+    <h3>隊員方塊顏色說明</h3>
+    <p>每位隊員以色彩方塊顯示，顏色代表慣用邊：</p>
+    <div class="chips-demo">
+      <div class="chip-demo chip-L">王小明 <span class="badge">左</span></div>
+      <div class="chip-demo chip-R">李大華 <span class="badge">右</span></div>
+      <div class="chip-demo chip-B">張美玲 <span class="badge">雙</span></div>
+      <div class="chip-demo chip-D">陳志偉 <span class="badge">鼓</span></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>顏色</th><th>意義</th></tr>
+        <tr><td>藍色</td><td>慣用左槳</td></tr>
+        <tr><td>粉紅色</td><td>慣用右槳</td></tr>
+        <tr><td>紫色</td><td>左右皆可（雙）</td></tr>
+        <tr><td>黃色虛線框</td><td>已指定為鼓手</td></tr>
+      </table>
+    </div>
+
+    <h3>慣用邊不符提示</h3>
+    <p>若將慣用左的隊員拖到右側槳位（或反之），方塊上會出現 <span class="warn-demo">⚠</span> 標記提醒，但<strong>不會強制禁止</strong>，最終由教練自行決定。</p>
+
+    <h3>刪除隊員</h3>
+    <p>點擊隊員方塊右側的 <strong>✕</strong> 按鈕，確認後即刪除，已排入的位置也會同步清空。</p>
+  </div>
+
+  <!-- 4. 排位操作 -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="sec-num">04</div>
+      <div class="sec-title">排位操作</div>
+    </div>
+
+    <h3>基本拖拉流程</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>從待命池取人</strong><span>所有未分配的隊員都在右側下方的「待命池」，用滑鼠按住方塊不放</span></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>拖到目標位置</strong><span>移動到想要的槳位（L1～L9 左側、R1～R9 右側）、鼓手位、靈活運用區，放開滑鼠</span></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>換位</strong><span>直接把已排入的人拖到另一個位置；若目標位置已有人，原本的人會自動退回待命池</span></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><strong>退回待命池</strong><span>把任何人拖回待命池或靈活運用區皆可</span></div></div>
+    </div>
+
+    <h3>槳位排列說明</h3>
+    <p>船身由上到下分為三段：</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>區段</th><th>排數</th><th>建議用途</th></tr>
+        <tr><td>前段（節奏）</td><td>第 1～3 排</td><td>節奏感穩、技術好，帶動全船划頻</td></tr>
+        <tr><td>中段（引擎）</td><td>第 4～7 排</td><td>力量最大，體重較重，主要推進力</td></tr>
+        <tr><td>後段（配合舵手）</td><td>第 8～9 排</td><td>能跟拍、配合舵手修正船向</td></tr>
+      </table>
+    </div>
+
+    <h3>靈活運用區</h3>
+    <div class="zone-demo zone-flex">🔄 靈活運用區（待定 / 左右開弓）—— 放置尚未決定位置、或等候調度的隊員</div>
+    <p>可作為思考中繼站，拖入靈活區的人不佔任何槳位，也不計入左右人數統計。</p>
+
+    <h3>待命池</h3>
+    <div class="zone-demo zone-pool">⚓ 待命池（未分配）—— 所有尚未分配的隊員從這裡拖走</div>
+
+    <h3>舵手設定</h3>
+    <p>舵手區塊提供兩種模式，點擊切換：</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>模式</th><th>說明</th></tr>
+        <tr><td>大會公派（預設）</td><td>顯示固定文字，不佔隊員名額，無法拖拉</td></tr>
+        <tr><td>自選舵手</td><td>解鎖槳位，可從隊員中拖人進來，此人不計入槳手人數</td></tr>
+      </table>
+    </div>
+
+    <h3>全部退回待命池</h3>
+    <p>點擊上方紅色「↺ 全部退回待命池」按鈕，所有排位清空重來（隊員名單不受影響）。</p>
+  </div>
+
+  <!-- 5. 統計與提示 -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="sec-num">05</div>
+      <div class="sec-title">統計與提示</div>
+    </div>
+    <p>頁面頂端統計列即時顯示五項數據：</p>
+
+    <div class="stat-demo">
+      <div class="stat-card"><div class="sl">左槳人數</div><div class="sv">8</div></div>
+      <div class="stat-card"><div class="sl">右槳人數</div><div class="sv">8</div></div>
+      <div class="stat-card"><div class="sl">槳手合計</div><div class="sv">16</div></div>
+      <div class="stat-card stat-ok"><div class="sl">出賽狀態</div><div class="svt">✓ 符合出賽</div></div>
+      <div class="stat-card stat-ok"><div class="sl">左右體重差</div><div class="svt">✓ 平衡</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>統計項目</th><th>說明</th></tr>
+        <tr><td>左槳人數</td><td>目前排入左側（L1～L9）的槳手總數</td></tr>
+        <tr><td>右槳人數</td><td>目前排入右側（R1～R9）的槳手總數</td></tr>
+        <tr><td>槳手合計</td><td>左＋右合計（不含鼓手、舵手）</td></tr>
+        <tr><td>出賽狀態</td><td>符合條件才顯示綠色，否則顯示紅色警示</td></tr>
+        <tr><td>左右體重差</td><td>差值 ≤ 5 kg 顯示綠色，超過顯示紅色；有人未填體重時顯示「部分缺體重」</td></tr>
+      </table>
+    </div>
+
+    <h3>出賽狀態判斷條件</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>狀態</th><th>條件</th></tr>
+        <tr><td>✓ 符合出賽</td><td>左右人數相等，且合計為 16～18 人</td></tr>
+        <tr><td>⚠ 左右不平衡</td><td>左右槳手人數不同</td></tr>
+        <tr><td>⚠ 槳手不足 16 人</td><td>合計低於 16 人</td></tr>
+        <tr><td>⚠ 超過 18 人</td><td>合計超過 18 人</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 6. 匯出匯入 -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="sec-num">06</div>
+      <div class="sec-title">xlsx 匯出與匯入</div>
+    </div>
+
+    <h3>匯出隊員資料（↓ 匯出 xlsx）</h3>
+    <p>點擊左側底部的「↓ 匯出 xlsx」按鈕，瀏覽器會下載一個 Excel 檔案，檔名格式如下：</p>
+    <div class="note"><strong>檔名範例</strong>龍舟隊員資料_20260603121603.xlsx<br>數字為匯出當下的時間（年月日時分秒），每次匯出檔名不同，方便區分不同版本。</div>
+
+    <p>此 Excel 包含兩個工作表：</p>
+
+    <p><strong>工作表一：隊員名單</strong></p>
+    <div class="xlsx-preview">
+      <div class="xlsx-header">📋 工作表：隊員名單</div>
+      <div class="xlsx-body">
+        <div class="xrow head xcols-roster"><div>id</div><div>姓名</div><div>慣用邊</div><div>體重(kg)</div></div>
+        <div class="xrow xcols-roster"><div>1</div><div>王小明</div><div>左</div><div>72</div></div>
+        <div class="xrow xcols-roster"><div>2</div><div>李大華</div><div>右</div><div>68</div></div>
+        <div class="xrow xcols-roster"><div>3</div><div>張美玲</div><div>雙</div><div></div></div>
+      </div>
+    </div>
+
+    <p><strong>工作表二：排位結果</strong></p>
+    <div class="xlsx-preview">
+      <div class="xlsx-header">📋 工作表：排位結果</div>
+      <div class="xlsx-body">
+        <div class="xrow head xcols-layout"><div>體重(kg)</div><div>慣用邊</div><div>← 左槳</div><div>排</div><div>右槳 →</div><div>慣用邊</div><div>體重(kg)</div></div>
+        <div class="xrow xcols-layout center"><div></div><div></div><div>王小明</div><div>1</div><div>李大華</div><div></div><div></div></div>
+        <div class="xrow xcols-layout center"><div>72</div><div>左</div><div>陳結勝</div><div>2</div><div>黃安仕</div><div>右</div><div>80</div></div>
+        <div class="xrow xcols-layout center"><div></div><div></div><div>…</div><div>…</div><div>…</div><div></div><div></div></div>
+      </div>
+    </div>
+    <p>排位表格中，左右槳手姓名在中間相鄰，排號夾在中間，一眼即可對照左右配對。</p>
+
+    <h3>匯入隊員資料（↑ 匯入 xlsx）</h3>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><strong>點擊「↑ 匯入 xlsx」</strong><span>選擇之前由本系統匯出的 xlsx 檔案</span></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><strong>確認匯入</strong><span>系統會顯示即將匯入的人數，確認後取代現有名單</span></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><strong>重新排位</strong><span>匯入後所有人回到待命池，排位需重新安排</span></div></div>
+    </div>
+
+    <div class="note"><strong>注意</strong>匯入功能只讀取「隊員名單」工作表，排位結果不會被還原。每次開啟系統後需重新拖拉排位。</div>
+
+    <h3>匯出排位結果文字</h3>
+    <p>點擊右側「↓ 匯出排位結果」按鈕，會彈出文字格式的排位表，可<strong>複製文字</strong>貼到 LINE、通訊軟體或印出分發。</p>
+  </div>
+
+  <!-- 7. 注意事項 -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="sec-num">07</div>
+      <div class="sec-title">注意事項</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>項目</th><th>說明</th></tr>
+        <tr><td>資料不會自動儲存</td><td>關閉瀏覽器後排位結果會消失，請在排好後立即匯出 xlsx 或複製排位文字</td></tr>
+        <tr><td>隊員名單可保存</td><td>隊員基本資料（姓名、慣用邊、體重）請使用「匯出 xlsx」存檔，下次使用匯入即可，不用重打</td></tr>
+        <tr><td>網路需求</td><td>首次開啟需要網路載入字型，之後完全離線可用；xlsx 匯出功能也需要網路載入 SheetJS 套件（僅第一次）</td></tr>
+        <tr><td>瀏覽器相容</td><td>建議使用 Chrome、Edge 或 Safari，IE 不支援</td></tr>
+        <tr><td>體重欄位</td><td>體重可以部分填寫，有填的人才計入配重統計，不影響排位功能</td></tr>
+        <tr><td>慣用邊只是提示</td><td>⚠ 標記只是建議，不會強制阻擋任何排位，最終決定權在教練</td></tr>
+      </table>
+    </div>
+
+    <div class="note" style="margin-top:20px;border-color:var(--red);">
+      <strong>💡 建議使用流程</strong>
+      1. 開始前先匯入隊員名單 xlsx（若已有存檔）<br>
+      2. 確認隊員名單，新增當天出席者<br>
+      3. 拖拉排位，觀察統計列確認出賽條件<br>
+      4. 確認後匯出排位結果文字傳給隊員<br>
+      5. 匯出 xlsx 存檔備份本次排位紀錄
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  龍舟排位系統 使用說明書｜大龍舟 18 槳版本<br>
+  本工具為單一 HTML 檔，無需安裝，瀏覽器開啟即用
+</footer>
+
+</body>
+</html>
