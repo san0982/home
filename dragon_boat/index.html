@@ -248,6 +248,135 @@ header .sub{font-size:16.5px;opacity:.4;margin-left:auto;}
 /* modal */
 #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;}
 .modal-box{background:#fff;border-radius:12px;padding:22px;width:520px;max-height:82vh;overflow-y:auto;}
+
+/* 手機版 RWD 開關與切換 tab */
+.mobile-tabs {
+  display: none;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  position: sticky;
+  top: 46px;
+  z-index: 99;
+  width: 100%;
+}
+.mobile-tab-btn {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  color: #aaa;
+  font-size: 16.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s;
+}
+.mobile-tab-btn.active {
+  color: #fff;
+  background: #2b2b2b;
+  border-bottom: 3px solid #e8c84a;
+}
+
+/* 點選模式下被選取的狀態 */
+.chip.selected {
+  outline: 3px solid #3a7bd5;
+  box-shadow: 0 0 10px rgba(58, 123, 213, 0.5);
+  transform: scale(1.03);
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 17px;
+  }
+  header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  header h1 {
+    font-size: 19px;
+  }
+  header .sub {
+    font-size: 12px;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+  .mobile-tabs {
+    display: flex;
+  }
+  .page {
+    flex-direction: column;
+    min-height: calc(100vh - 80px);
+  }
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid #e0ddd8;
+    display: none; /* 手機上預設隱藏 */
+  }
+  .sidebar.active {
+    display: flex;
+  }
+  .main {
+    width: 100%;
+    padding: 10px 8px;
+    display: none; /* 手機上預設隱藏 */
+  }
+  .main.active {
+    display: block;
+  }
+  
+  .stats {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+  }
+  .stats .stat {
+    padding: 6px 8px;
+  }
+  .stats .stat:nth-child(1), .stats .stat:nth-child(2), .stats .stat:nth-child(3) {
+    grid-column: span 2;
+  }
+  .stats .stat:nth-child(4), .stats .stat:nth-child(5) {
+    grid-column: span 3;
+  }
+  .stat .l {
+    font-size: 11px;
+  }
+  .stat .v {
+    font-size: 20px;
+  }
+  .stat .vt {
+    font-size: 14px;
+  }
+  
+  .action-bar {
+    justify-content: center;
+  }
+  .modal-box {
+    width: 95%;
+    padding: 15px;
+  }
+  .row-grid {
+    grid-template-columns: 1fr 22px 1fr;
+    gap: 3px;
+  }
+  .row-num {
+    font-size: 13px;
+  }
+  .chip {
+    font-size: 16px;
+    padding: 4px 6px;
+  }
+  .pc {
+    font-size: 16px;
+    padding: 4px 6px;
+  }
+}
 </style>
 </head>
 <body>
@@ -292,6 +421,12 @@ header .sub{font-size:16.5px;opacity:.4;margin-left:auto;}
   <span class="sub" id="boat-sub">大龍舟 18 槳｜左右各 9 排｜最少 16 槳手</span>
 </header>
 
+<!-- 手機版頁籤切換 -->
+<div class="mobile-tabs" id="mobile-tabs">
+  <button class="mobile-tab-btn active" id="tab-boat" onclick="switchMobileTab('boat')">⛵ 船身排位</button>
+  <button class="mobile-tab-btn" id="tab-roster" onclick="switchMobileTab('roster')">👥 槳手名單</button>
+</div>
+
 <div class="page">
 
   <!-- 左側 -->
@@ -317,9 +452,8 @@ header .sub{font-size:16.5px;opacity:.4;margin-left:auto;}
   </div>
 
   <!-- 右側 -->
-  <div class="main">
+  <div class="main active">
     <div class="stats" id="stats"></div>
-
     <div class="action-bar">
       <button class="btn danger" onclick="resetAll()">↺ 全部退回待命池</button>
       <button class="btn primary" onclick="exportResult()">↓ 匯出排位結果</button>
@@ -713,15 +847,44 @@ function buildRows(){
   });
 }
 
+var selectedMemberId = null;
+
 function makeChip(p,pos){
   var isDrummer=(pos==='drummer');
   var isFlagger=(pos==='flagger');
+  var isSelected=(selectedMemberId===p.id);
   var warn=(!isDrummer&&!isFlagger&&pos!=='steerer'&&/^[LR]\d/.test(pos)&&mismatch(p,pos))?'<span class="warn">⚠</span>':'';
   var wStr=p.weight?'<span class="cw">'+p.weight+'kg</span>':'';
   var chip=document.createElement('div');
-  chip.className='chip '+p.side+(isDrummer?' drummer-style':'')+(isFlagger?' flagger-style':'');
+  chip.className='chip '+p.side+(isDrummer?' drummer-style':'')+(isFlagger?' flagger-style':'')+(isSelected?' selected':'');
   chip.draggable=true;chip.dataset.id=p.id;
   chip.innerHTML='<span class="grip">⠿</span><span class="cname">'+p.name+'</span>'+wStr+warn+'<span class="badge">'+sideLabel[p.side]+'</span><button class="del" title="退回待命池" onclick="returnToPool('+p.id+',event)">↩</button>';
+  
+  chip.addEventListener('click', function(e) {
+    if (e.stopPropagation) e.stopPropagation();
+    if (e.target.closest('.del')) return;
+    
+    if (selectedMemberId === null) {
+      selectedMemberId = p.id;
+      render();
+    } else if (selectedMemberId === p.id) {
+      selectedMemberId = null;
+      render();
+    } else {
+      var bPos = getPos(p.id);
+      if (bPos && bPos !== 'pool') {
+        place[p.id] = 'pool';
+        place[selectedMemberId] = bPos;
+        selectedMemberId = null;
+        render();
+        syncLineups();
+      } else {
+        selectedMemberId = p.id;
+        render();
+      }
+    }
+  });
+
   chip.addEventListener('dragstart',function(e){dragId=p.id;setTimeout(function(){chip.classList.add('dragging');},0);e.dataTransfer.effectAllowed='move';});
   chip.addEventListener('dragend',function(){chip.classList.remove('dragging');dragId=null;});
   return chip;
@@ -1066,7 +1229,66 @@ var style=document.createElement('style');
 style.textContent='.chip.flagger-style{background:#ffeaea;color:#8b2020;border-color:#f5a8a8;border-style:dashed;}.chip.flagger-style .badge{background:#8b2020;color:#fff;}';
 document.head.appendChild(style);
 
+// 全域點擊監聽，實現點選目的地移動晶片 (手機點選排位)
+document.addEventListener('click', function(e) {
+  if (selectedMemberId === null) return;
+  if (e.target.closest('.chip')) return;
+  
+  var dz = e.target.closest('.dropzone');
+  if (!dz) {
+    selectedMemberId = null;
+    render();
+    return;
+  }
+  
+  var pos = dz.dataset.pos;
+  if (!pos) return;
+  
+  if (place[selectedMemberId] === pos) {
+    selectedMemberId = null;
+    render();
+    return;
+  }
+  
+  if (pos === 'drummer' || pos === 'flagger' || pos === 'steerer' || /^[LR]\d+$/.test(pos)) {
+    roster.forEach(function(p) {
+      if (place[p.id] === pos && p.id !== selectedMemberId) {
+        place[p.id] = 'pool';
+      }
+    });
+  }
+  
+  place[selectedMemberId] = pos;
+  selectedMemberId = null;
+  render();
+  syncLineups();
+});
+
+// 手機版頁籤切換
+var currentMobileTab = 'boat';
+function switchMobileTab(tab) {
+  currentMobileTab = tab;
+  document.getElementById('tab-boat').classList.toggle('active', tab === 'boat');
+  document.getElementById('tab-roster').classList.toggle('active', tab === 'roster');
+  
+  var sidebar = document.querySelector('.sidebar');
+  var main = document.querySelector('.main');
+  
+  if (tab === 'boat') {
+    sidebar.classList.remove('active');
+    main.classList.add('active');
+  } else {
+    sidebar.classList.add('active');
+    main.classList.remove('active');
+  }
+}
+
 buildRows();setupDrop();render();
+
+// 初始化手機版預設頁籤
+if (window.innerWidth <= 768) {
+  switchMobileTab('boat');
+}
 </script>
 </body>
 </html>
